@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#f6f3ed">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <title>Weekly Rhythm</title>
+  <title>Weekly Rhythm - June Plan</title>
   <style>
     :root {
       color-scheme: light;
@@ -352,7 +352,7 @@
       right: 0;
       bottom: 0;
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(8, 1fr);
       gap: 0;
       padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
       background: rgba(253, 251, 247, 0.96);
@@ -389,6 +389,48 @@
     }
 
     li { margin: 6px 0; }
+
+
+    .month-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .date-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px 11px;
+    }
+
+    .date-card.today {
+      border-color: rgba(47, 97, 143, 0.55);
+      box-shadow: 0 0 0 3px rgba(47, 97, 143, 0.08);
+    }
+
+    .date-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 750;
+      margin-bottom: 4px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--panel-soft);
+    }
 
     @media (min-width: 700px) {
       .two-col {
@@ -449,6 +491,29 @@
       </div>
     </section>
 
+    <section class="view" id="monthView">
+      <div class="card soft">
+        <h2>June Operating Plan</h2>
+        <p class="muted">Master schedule for fixed items, flexible tasks, lifts, runs, house rooms, and travel status. Use Today for execution.</p>
+      </div>
+      <div class="card">
+        <h2>Today's June Items</h2>
+        <div id="monthTodayItems"></div>
+      </div>
+      <div class="card">
+        <h2>Operating Rules</h2>
+        <div id="operatingRules"></div>
+      </div>
+      <div class="card">
+        <h2>June Schedule</h2>
+        <div class="month-list" id="juneScheduleList"></div>
+      </div>
+      <div class="card">
+        <h2>Room Tasks / Projects</h2>
+        <div id="roomProjectList"></div>
+      </div>
+    </section>
+
     <section class="view" id="weekView">
       <div class="card soft">
         <h2>Week Status</h2>
@@ -483,11 +548,11 @@
           </div>
         </div>
         <div class="field">
-          <label>Expected walk days</label>
+          <label>Expected run days</label>
           <div class="weekday-grid" id="walkDays"></div>
         </div>
         <div class="field">
-          <label for="walkWeatherOK">Weather allows walks this week</label>
+          <label for="walkWeatherOK">Weather allows outdoor runs this week</label>
           <select id="walkWeatherOK">
             <option value="true">Yes</option>
             <option value="false">Not really</option>
@@ -576,7 +641,7 @@
       <div class="card">
         <h2>Settings</h2>
         <div class="field"><label for="wakeTime">Wake time</label><input id="wakeTime" type="text"></div>
-        <div class="field"><label for="walkWindow">Walk window</label><input id="walkWindow" type="text"></div>
+        <div class="field"><label for="walkWindow">Run window</label><input id="walkWindow" type="text"></div>
         <div class="field"><label for="leaveForWorkTarget">Leave for work target</label><input id="leaveForWorkTarget" type="text"></div>
         <div class="field"><label for="homeFromWork">Home from work</label><input id="homeFromWork" type="text"></div>
         <div class="field"><label for="bedtimeUpstairs">Bedtime/upstairs</label><input id="bedtimeUpstairs" type="text"></div>
@@ -613,7 +678,7 @@
       green: {
         title: "Green",
         message: "Green day: do the planned workout or task.",
-        action: "Normal rhythm. Walk if weather allows, reset the kitchen, and protect bedtime."
+        action: "Normal rhythm. Run if planned, reset the kitchen, and protect bedtime."
       },
       yellow: {
         title: "Yellow",
@@ -627,21 +692,86 @@
       }
     };
 
+    const juneSchedule = {
+      "2026-06-02": { status: "Sarah gone", items: ["Make ice", "Wine and liquor inventory"] },
+      "2026-06-03": { status: "Sarah gone", items: ["Tire air", "Mow backyard only", "Golf range", "Lift"] },
+      "2026-06-04": { status: "Sarah home", items: ["Grand Rapids City Hall", "Haircut", "Lift", "2-mile run"] },
+      "2026-06-05": { status: "Sarah home", items: [] },
+      "2026-06-06": { status: "Sarah gone after airport", items: ["Drop Sarah off at airport", "Clean garage and sheds", "Ava's grad party, 4:30-7:30 at Egypt Valley", "Oren's birthday, 4:30-6:30", "Lift", "2-mile run"] },
+      "2026-06-07": { status: "Sarah gone", items: ["Clean workshop", "Iron shirts", "Dungeons & Dragons", "Lift", "2-mile run"] },
+      "2026-06-08": { status: "Sarah gone", items: ["Kitchen", "Golf range"] },
+      "2026-06-09": { status: "Sarah gone", items: ["Office", "Mow front/back flex window begins", "Lift", "2-mile run"] },
+      "2026-06-10": { status: "Sarah gone", items: ["Drop off Sarah's Jeep for detailing", "Mow front/back if not done", "Lift", "3-mile run"] },
+      "2026-06-11": { status: "Sarah gone", items: ["Pick up Sarah", "Mow front/back if not done"] },
+      "2026-06-12": { status: "Sarah home", items: ["Scholar restaurant, 6:30", "Lift"] },
+      "2026-06-13": { status: "Sarah home", items: ["Weed garden / pull straw blankets", "The Outsiders at 7:30", "Lift"] },
+      "2026-06-14": { status: "Sarah home", items: ["The Stekewyses' at 3:00", "3-mile run"] },
+      "2026-06-15": { status: "Sarah gone", items: ["Basement", "Golf range", "Lift"] },
+      "2026-06-16": { status: "Sarah gone", items: ["Laundry room", "Lift", "2-mile run"] },
+      "2026-06-17": { status: "Sarah gone", items: ["Living room", "Bedroom", "Golf range"] },
+      "2026-06-18": { status: "Sarah gone", items: ["Bathroom", "Lift", "3-mile run"] },
+      "2026-06-19": { status: "Sarah gone", items: ["Golf with Grand Rapids guys", "Lift"] },
+      "2026-06-20": { status: "Sarah home", items: ["Mow front/back", "Campground"] },
+      "2026-06-21": { status: "Sarah home", items: ["Iron shirts", "Golf range", "Lift", "3-mile run"] },
+      "2026-06-22": { status: "Both gone", items: ["Mom and Dad's", "No golf/range expectations"] },
+      "2026-06-23": { status: "Both gone", items: ["Mom and Dad's", "No golf/range expectations"] },
+      "2026-06-24": { status: "Both gone", items: ["Mom and Dad's", "No golf/range expectations"] },
+      "2026-06-25": { status: "Both home", items: ["Haircut", "Lift", "3-mile run"] },
+      "2026-06-26": { status: "Both home", items: ["Guys night", "Lift"] },
+      "2026-06-27": { status: "Both home", items: ["Mow front/back", "Legally Blonde at 7:30", "5-mile run"] },
+      "2026-06-28": { status: "Both home", items: ["Golf range", "Lift"] },
+      "2026-06-29": { status: "Both home", items: ["Lift", "3-mile run"] },
+      "2026-06-30": { status: "Both home", items: [] },
+      "2026-07-01": { status: "Both home", items: ["Lift", "3-mile run"] },
+      "2026-07-02": { status: "Both home", items: ["Lift", "3-mile run"] }
+    };
+
+    const operatingRules = [
+      "Fixed items do not move; appointments, shows, parties, travel, pickups, and drop-offs stay anchored.",
+      "Flex items move within the week: mowing, range, room resets, and most errands can slide.",
+      "Missed room tasks move to the next light day. Do not stack multiple room resets onto heavy days.",
+      "Runs may shift within the week, but aim for three runs per week.",
+      "Lift default is two rounds. Bonus rounds are optional and only when time, soreness, and form allow.",
+      "Keep at least one catch-up or light day each week; blank space is part of the plan.",
+      "Weather fallback: mowing and range move to the next dry/light day; run distance can shrink before the habit gets skipped.",
+      "When Sarah is gone, keep meals simple, protect bedtime, and avoid turning room resets into major projects."
+    ];
+
+    const roomTasks = {
+      "Bedroom": ["Tidy", "Nightstand"],
+      "Office": ["Tidy"],
+      "Guest room": ["Tidy", "Check bed"],
+      "Living room": ["Tidy"],
+      "Kitchen": ["Tidy"],
+      "Bathroom": ["Tidy"],
+      "Basement": ["Tidy", "Dust drums", "Clean bathroom"],
+      "Laundry room": ["Tidy"]
+    };
+
+    const futureProjects = {
+      "Bedroom": ["Replace mattress"],
+      "Office": ["Match paint"],
+      "Living room": ["Touch-up paint"],
+      "Kitchen": ["Touch-up paint"],
+      "Bathroom": ["Remodel"],
+      "Laundry": ["Storage door", "Replace washer and dryer"]
+    };
+
     const workoutData = {
       emergency10: {
-        title: "10-minute emergency workout",
+        title: "10-minute fallback",
         minutes: 10,
-        exercises: ["Rotate for 10 minutes", "Push-ups", "Squats", "Rows", "Plank"]
+        exercises: ["Move continuously for 10 minutes", "Bodyweight squats", "Push-ups or floor presses", "Rows", "Dead bug"]
       },
       workoutA: {
-        title: "25-minute Workout A",
-        minutes: 25,
-        exercises: ["Repeat 3 rounds", "Goblet squat, 10-12 reps", "Push-ups, 10-20 reps", "One-arm dumbbell row, 10-15 each side", "Romanian deadlift, 10-12 reps", "Plank, 30-45 seconds"]
+        title: "20-minute superset lift",
+        minutes: 20,
+        exercises: ["Use the printed/PDF rotation", "Superset A: 3 exercises, 2 rounds", "Superset B: 3 exercises, 2 rounds", "Rest 45-75 seconds between rounds", "Bonus third round only if form, soreness, and time all allow"]
       },
       workoutB: {
-        title: "25-minute Workout B",
-        minutes: 25,
-        exercises: ["Repeat 3 rounds", "Dumbbell floor press or bench press, 10-12 reps", "Band rows or pull-up bar hangs/assisted pulls, 8-12 reps", "Dumbbell curls, 10-15 reps", "Overhead triceps extension, 10-15 reps", "Dead bug or side plank, 30-45 seconds"]
+        title: "Mobility / recovery",
+        minutes: 12,
+        exercises: ["Easy hips and hamstrings", "Shoulder circles", "Light core bracing", "Easy walk or stretch", "Protect tomorrow's lift/run"]
       }
     };
 
@@ -653,11 +783,11 @@
     };
 
     const scoreItems = [
-      ["strength1Complete", "Strength workout 1"],
-      ["strength2Complete", "Strength workout 2"],
-      ["walk1Complete", "Walk 1"],
-      ["walk2Complete", "Walk 2"],
-      ["walk3Complete", "Walk 3 optional"],
+      ["strength1Complete", "Lift 1"],
+      ["strength2Complete", "Lift 2"],
+      ["walk1Complete", "Run 1"],
+      ["walk2Complete", "Run 2"],
+      ["walk3Complete", "Run 3"],
       ["kitchenResetMostNights", "Kitchen reset most nights"],
       ["trashHandled", "Trash/recycling/cardboard handled"],
       ["eveningPrepComplete", "Prepare lunch and put out clothes"],
@@ -667,6 +797,7 @@
 
     const tabs = [
       ["today", "☀︎", "Today"],
+      ["month", "▦", "June"],
       ["week", "✓", "Week"],
       ["plan", "◷", "Plan"],
       ["service", "✦", "Service"],
@@ -684,7 +815,7 @@
       return {
         settings: {
           wakeTime: "5:00 AM",
-          walkWindow: "5:30-6:00 AM",
+          walkWindow: "Run window: morning, lunch, or after work",
           leaveForWorkTarget: "6:30-6:45 AM",
           homeFromWork: "5:45-6:00 PM",
           bedtimeUpstairs: "8:00 PM",
@@ -698,7 +829,7 @@
         plan: {
           strengthDay1: "tuesday",
           strengthDay2: "thursday",
-          expectedWalkDays: ["monday", "wednesday", "friday"],
+          expectedWalkDays: ["tuesday", "thursday", "saturday"],
           walkWeatherOK: true,
           golfRangeMode: "neither",
           plannedGolfRangeDay: "saturday",
@@ -708,7 +839,7 @@
         dailyEntries: {},
         scorecard: {},
         serviceTasks: Object.fromEntries(Object.entries(serviceDefaults).map(([category, tasks]) => [category, tasks.map(title => ({ title, done: false }))])),
-        workoutType: "emergency10",
+        workoutType: "workoutA",
         workoutCompletions: []
       };
     }
@@ -778,13 +909,13 @@
       const items = [
         "Walk with wife, weather allowing",
         "Clean up after myself",
-        "Support dinner without getting in the way",
+        "Keep meals simple / support dinner",
         "After-dinner kitchen reset",
         "Prepare lunch",
         "Put out clothes",
         "Protect bedtime"
       ];
-      if (day === state.plan.strengthDay1 || day === state.plan.strengthDay2) items.push("25-minute strength workout");
+      if (day === state.plan.strengthDay1 || day === state.plan.strengthDay2) items.push("20-minute superset lift");
       if (day === state.settings.defaultPlanningDay || day === "monday") items.push("10-minute weekly planning check");
       if (state.settings.showOptionalItems && state.plan.golfRangeMode !== "neither" && day === state.plan.plannedGolfRangeDay) {
         items.push(`${titleCase(state.plan.golfRangeMode)} plus one household offset`);
@@ -819,6 +950,7 @@
       document.getElementById("todayDate").textContent = new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
       renderTabs();
       renderToday();
+      renderMonth();
       renderWeek();
       renderPlan();
       renderService();
@@ -929,15 +1061,15 @@
       const focuses = [];
       if (state.plan.expectedWalkDays.includes(day)) {
         focuses.push({
-          title: "Walk window",
-          detail: state.plan.walkWeatherOK ? `${state.settings.walkWindow}, weather allowing.` : "Weather is not cooperating. No penalty this week."
+          title: "Run window",
+          detail: state.plan.walkWeatherOK ? `${state.settings.walkWindow}, weather allowing.` : "Weather is not cooperating. Move the run within the week."
         });
       }
       if (day === state.plan.strengthDay1 || day === state.plan.strengthDay2) {
-        focuses.push({ title: "Strength", detail: "25 minutes if green, 10 minutes if yellow." });
+        focuses.push({ title: "Strength", detail: "20-minute superset if green, 10-minute fallback if yellow." });
       }
       if (day === state.settings.defaultPlanningDay || day === "monday") {
-        focuses.push({ title: "Planning check", detail: "Pick workout days, walk days, golf/range, and one household task." });
+        focuses.push({ title: "Planning check", detail: "Pick workout days, run days, golf/range, and one household task." });
       }
       if (state.plan.golfRangeMode !== "neither" && day === state.plan.plannedGolfRangeDay) {
         focuses.push({ title: titleCase(state.plan.golfRangeMode), detail: "Pair it with one helpful household offset." });
@@ -961,7 +1093,7 @@
         }],
         ["Yellow 10 minutes", () => {
           entry.dayType = "yellow";
-          markTodayItem("25-minute strength workout");
+          markTodayItem("20-minute superset lift");
           if (!state.scorecard.strength1Complete) state.scorecard.strength1Complete = true;
         }],
         ["Red day reset", () => {
@@ -994,12 +1126,12 @@
 
     function syncScoreFromTodayItem(title, checked) {
       if (!checked) return;
-      if (title.includes("Walk with wife")) {
+      if (title.includes("mile run") || title.includes("Run")) {
         if (!state.scorecard.walk1Complete) state.scorecard.walk1Complete = true;
         else if (!state.scorecard.walk2Complete) state.scorecard.walk2Complete = true;
         else state.scorecard.walk3Complete = true;
       }
-      if (title.includes("strength workout")) {
+      if (title.includes("Lift") || title.includes("lift")) {
         if (!state.scorecard.strength1Complete) state.scorecard.strength1Complete = true;
         else state.scorecard.strength2Complete = true;
       }
@@ -1018,11 +1150,87 @@
       const day = weekDayKey();
       if (dayType === "red") return dayTypes.red.action;
       if (dayType === "yellow") return dayTypes.yellow.action;
-      if (day === state.plan.strengthDay1 || day === state.plan.strengthDay2) return "Strength day. A steady 25 minutes is enough.";
+      if (day === state.plan.strengthDay1 || day === state.plan.strengthDay2) return "Lift day. The 20-minute two-round version is enough.";
       if (state.plan.golfRangeMode !== "neither" && day === state.plan.plannedGolfRangeDay) {
         return `${titleCase(state.plan.golfRangeMode)} day. Pair it with one helpful household action.`;
       }
       return dayTypes.green.action;
+    }
+
+    function renderMonth() {
+      const todayBox = document.getElementById("monthTodayItems");
+      if (!todayBox) return;
+      todayBox.innerHTML = "";
+      const todayPlan = juneSchedule[todayKey()];
+      if (todayPlan) {
+        todayBox.append(renderDateCard(todayKey(), todayPlan, true));
+      } else {
+        const p = document.createElement("p");
+        p.className = "muted";
+        p.textContent = "No June plan items for today's date.";
+        todayBox.append(p);
+      }
+
+      const rules = document.getElementById("operatingRules");
+      rules.innerHTML = "";
+      operatingRules.forEach(rule => rules.append(checkboxRow(rule, false, () => {})));
+
+      const list = document.getElementById("juneScheduleList");
+      list.innerHTML = "";
+      Object.entries(juneSchedule).forEach(([date, plan]) => list.append(renderDateCard(date, plan, date === todayKey())));
+
+      const roomBox = document.getElementById("roomProjectList");
+      roomBox.innerHTML = "";
+      const roomHeader = document.createElement("h3");
+      roomHeader.textContent = "Room resets";
+      roomBox.append(roomHeader);
+      Object.entries(roomTasks).forEach(([room, tasks]) => {
+        const div = document.createElement("div");
+        div.className = "check-row";
+        div.innerHTML = `<label><strong>${room}</strong><br><span class="muted small">${tasks.join("; ")}</span></label>`;
+        roomBox.append(div);
+      });
+      const projectHeader = document.createElement("h3");
+      projectHeader.textContent = "Future projects";
+      projectHeader.style.marginTop = "14px";
+      roomBox.append(projectHeader);
+      Object.entries(futureProjects).forEach(([area, tasks]) => {
+        const div = document.createElement("div");
+        div.className = "check-row";
+        div.innerHTML = `<label><strong>${area}</strong><br><span class="muted small">${tasks.join("; ")}</span></label>`;
+        roomBox.append(div);
+      });
+    }
+
+    function renderDateCard(dateKey, plan, isToday = false) {
+      const date = new Date(`${dateKey}T12:00:00`);
+      const div = document.createElement("div");
+      div.className = `date-card ${isToday ? "today" : ""}`;
+      const label = date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+      div.innerHTML = `<div class="date-head"><span>${label}</span><span class="muted small">${plan.status}</span></div>`;
+      const items = plan.items.length ? plan.items : ["Open / catch-up" ];
+      const ul = document.createElement("ul");
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        ul.append(li);
+      });
+      div.append(ul);
+      const tags = document.createElement("div");
+      tags.className = "tag-row";
+      if (plan.items.some(item => item.includes("Lift"))) tags.append(tag("Lift"));
+      if (plan.items.some(item => item.includes("mile run"))) tags.append(tag("Run"));
+      if (plan.items.some(item => item.includes("Mow"))) tags.append(tag("Mow"));
+      if (plan.items.some(item => item.includes("Golf") || item.includes("range"))) tags.append(tag("Golf/range"));
+      if (tags.children.length) div.append(tags);
+      return div;
+    }
+
+    function tag(text) {
+      const span = document.createElement("span");
+      span.className = "tag";
+      span.textContent = text;
+      return span;
     }
 
     function renderWeek() {
@@ -1072,12 +1280,12 @@
       container.innerHTML = "";
       const suggestions = [];
       if (!state.scorecard.strength1Complete) suggestions.push("Do the 10-minute emergency workout. That covers the strength floor.");
-      if (state.plan.walkWeatherOK && !state.scorecard.walk1Complete) suggestions.push("Take one easy walk if weather allows.");
-      if (state.plan.walkWeatherOK && state.scorecard.walk1Complete && !state.scorecard.walk2Complete) suggestions.push("A second walk makes the minimum week much easier.");
+      if (state.plan.walkWeatherOK && !state.scorecard.walk1Complete) suggestions.push("Take one scheduled run if weather allows.");
+      if (state.plan.walkWeatherOK && state.scorecard.walk1Complete && !state.scorecard.walk2Complete) suggestions.push("A second run makes the minimum week much easier.");
       if (!state.scorecard.kitchenResetMostNights) suggestions.push("Claim the kitchen reset for most nights, even if some nights are basic.");
       if (!state.scorecard.trashHandled) suggestions.push("Handle the trash/recycling/cardboard lane.");
       if (!state.scorecard.eveningPrepComplete) suggestions.push("Prepare lunch and put out clothes for tomorrow.");
-      if (good && !great && state.plan.golfRangeMode !== "neither") suggestions.push("Range or golf can be the bonus if it does not cost sleep or wife time.");
+      if (good && !great && state.plan.golfRangeMode !== "neither") suggestions.push("Range or golf can be the bonus if it does not cost sleep or recovery.");
       if (minimum) suggestions.push(great ? "Nothing to force. Keep the rhythm easy to restart." : good ? "Good is already here. Great is optional." : "Minimum met. Still counts.");
       suggestions.slice(0, 4).forEach(text => {
         const div = document.createElement("div");
