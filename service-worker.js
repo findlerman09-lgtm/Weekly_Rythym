@@ -1,4 +1,4 @@
-const CACHE_NAME = "weekly-rhythm-command-v3";
+const CACHE_NAME = "weekly-rhythm-command-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
